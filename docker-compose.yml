@@ -1,0 +1,33 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - default
+    restart: unless-stopped
+    depends_on:
+      - database
+    volumes:
+      - .:/var/www/html/
+      # add apache config for Slim Framework
+  database:
+    image: mysql:5
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    networks:
+      - default
+    volumes:
+      - ./db/migrations/:/docker-entrypoint-initdb.d/
+      # add persistent volume for production
+    environment:
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: random
+      MYSQL_ROOT_PASSWORD: random
+
+networks:
+  default:
